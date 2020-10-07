@@ -107,12 +107,9 @@ module Enumerable
           my_each { |x| acc = yield(acc, x) }
           acc
         end
+    end
       
          def multiply_els
           my_inject(5, :*)
         end
-      
-    
-      
-    end
-    
+        
