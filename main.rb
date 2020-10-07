@@ -31,22 +31,88 @@ module Enumerable
     end
     [1,2,3,4,5,6,7,8,9,10].my_select {|x| puts x if x.even? }
     end
-  
-    def all(args)
-      arr = to_a
-        if block_given?
-          arr.my_each {|x| return true unless yield(x) == false}
-        elsif args.empty
-          return false
-        elsif !arg.empty? && (args.is_a? Regexp)
-          arr.my_each { |x| return false unless x.match(args) }
-        elsif  (arg.is_a? Class) && !args.empty? 
-          arr.my_each { |x| return false unless [x.class, x.class.superclass].include?(args) }
-        else
-          to_a.my_each { |i| return false if i != arg }
+    def my_all(arg)
+   
+        arr = to_a
+          if block_given?
+            arr.my_each {|x| return true unless yield(x) == false}
+          elsif arg.empty
+            return false
+          elsif !arg.empty? && (arg.is_a? Regexp)
+            arr.my_each { |x| return false unless x.match(arg) }
+          elsif  (arg.is_a? Class) && !arg.empty? 
+            arr.my_each { |x| return false unless [x.class, x.class.superclass].include?(arg) }
+          else
+            to_a.my_each { |i| return false if i != arg }
+          
+        end
+        true
         
       end
-      true
+      
+      def my_any?(arg)
+          if block_given?
+            my_each { |x|
+              return true if yield x}
+      
+          elsif !arg.nil? && (arg.is_a? Class)
+            my_each {|x|
+              return false unless x.class == arg}
+            
+          elsif (arg.class == Regexp) && !arg.nil? 
+            my_each { |x|
+              return false unless arg.match(x)}
+            
+            
+          else
+            my_each {|x|
+              return true if x == arg}
+            
+          end
+          false
+        end
+      
+        def my_none?
+          return to_enum unless block_given?
+      
+          !my_any?
+        end
+        
+         def my_count(args = nil)
+          x = 0
+          if block_given?
+            my_each { |z| x += 1 if yield(z) == true }
+          elsif num.nil?
+            c = length
+          else
+            my_each { |z| x += 1 if z == num }
+          end
+          c
+        end
+      
+        def my_map(args)
+          final = []
+          if args == true
+            my_each {|x|
+              final.push(args).call(x)}
+            
+            return final
+          else
+            return self
+          end
+        end
+      
+        def my_inject(args = nil)
+          acc= args.nil? ? first : args
+          my_each { |x| acc = yield(acc, x) }
+          acc
+        end
+      
+         def multiply_els
+          my_inject(5, :*)
+        end
+      
+    
       
     end
     
