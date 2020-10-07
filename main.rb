@@ -34,44 +34,20 @@ module Enumerable
   end
   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].my_select { |x| puts x if x.even? }
 
-  def my_all(arg)
-    arr = to_a
+  def my_all?
     if block_given?
-      arr.my_each { |x| return true unless yield(x) == false }
-    elsif arg.empty
-      return false
-    elsif !arg.empty? && (arg.is_a? Regexp)
-      arr.my_each { |x| return false unless x.match(arg) }
-    elsif (arg.is_a? Class) && !arg.empty?
-      arr.my_each { |x| return false unless [x.class, x.class.superclass].include?(arg) }
+      my_each { |x| return true if yield(x) == true }
     else
-      to_a.my_each { |i| return false if i != arg }
-
+      my_each { |x| return true if x == true }
     end
     true
   end
 
-  def my_any?(arg)
+  def my_any?
     if block_given?
-      my_each do |x|
-        return true if yield x
-      end
-
-    elsif !arg.nil? && (arg.is_a? Class)
-      my_each do |x|
-        return false unless x.class == arg
-      end
-
-    elsif (arg.class == Regexp) && !arg.nil?
-      my_each do |x|
-        return false unless arg.match(x)
-      end
-
+      my_each { |x| return false unless yield(x) == true }
     else
-      my_each do |x|
-        return true if x == arg
-      end
-
+      my_each { |x| return false unless x == true }
     end
     false
   end
