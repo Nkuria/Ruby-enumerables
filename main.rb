@@ -14,7 +14,7 @@ module Enumerable
   end
   [1, 2, 3].my_each { |n| puts "#{n}!" }
 
-  def my_each_each_with_index
+  def my_each_with_index
     return to_enum unless block_given?
 
     i = 0
@@ -40,10 +40,10 @@ module Enumerable
   def my_all?(arg = nil)
     arr = to_a
     if block_given?
-      arr.my_each { |x| return true unless yield(x) == false }
+      arr.my_each { |x| return false if yield(x) == false }
       return true
     elsif arg.nil?
-      return false
+      arr.my_each { |x| return false if x == false || x.nil? }
     elsif !arg.nil? && (arg.is_a? Regexp)
       arr.my_each { |x| return false unless x.match(arg) }
     elsif (arg.is_a? Class) && !arg.nil?
@@ -56,23 +56,25 @@ module Enumerable
   end
 
   def my_any?(arg = nil)
+    arr = to_a
     if block_given?
-      my_each do |x|
-        return true if yield x
+      arr.my_each do |x|
+        return true if yield(x)
       end
+      return false
 
     elsif !arg.nil? && (arg.is_a? Class)
-      my_each do |x|
-        return false unless x.class == arg
-      end
+      arr.my_each { |x| return true if [x.class, x.class.superclass].include?(arg) }
 
-    elsif (arg.class == Regexp) && !arg.nil?
-      my_each do |x|
-        return false unless arg.match(x)
-      end
+    elsif (arg.is_a? Regexp) && !arg.nil?
+      arr.my_each { |x| return true if x.match(arg) }
+
+    elsif arg.nil?
+
+      arr.my_each { |x| return false if x == false || x.nil? }
 
     else
-      my_each do |x|
+      arr.my_each do |x|
         return true if x == arg
       end
 
@@ -80,7 +82,7 @@ module Enumerable
     false
   end
 
-  def my_none?
+  def my_none?(_arg = nil)
     return to_enum unless block_given?
 
     !my_any?
@@ -90,12 +92,12 @@ module Enumerable
     x = 0
     if block_given?
       my_each { |z| x += 1 if yield(z) == true }
-    elsif arg.nil?
-      c = length
+    elsif !args.nil?
+      my_each { |z| x += 1 if z == arg }
     else
-      my_each { |z| x += 1 if z == args }
+      my_each { |z| x += 1 if z == true }
     end
-    c
+    x
   end
 
   def my_map(proc = nil)
