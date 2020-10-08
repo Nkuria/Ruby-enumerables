@@ -32,28 +32,30 @@ module Enumerable
 
     arr = to_a
     final_array = []
-    arr.my_each { |x| final_array.push[x] if yield(x) }
+    arr.my_each { |x| final_array.push(x) if yield(x) }
+    final_array
   end
   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].my_select { |x| puts x if x.even? }
 
-  def my_all(arg)
+  def my_all?(arg = nil)
     arr = to_a
     if block_given?
       arr.my_each { |x| return true unless yield(x) == false }
-    elsif arg.empty
+      return true
+    elsif arg.nil?
       return false
-    elsif !arg.empty? && (arg.is_a? Regexp)
+    elsif !arg.nil? && (arg.is_a? Regexp)
       arr.my_each { |x| return false unless x.match(arg) }
-    elsif (arg.is_a? Class) && !arg.empty?
+    elsif (arg.is_a? Class) && !arg.nil?
       arr.my_each { |x| return false unless [x.class, x.class.superclass].include?(arg) }
     else
-      to_a.my_each { |i| return false if i != arg }
+      arr.my_each { |i| return false if i != arg }
 
     end
     true
   end
 
-  def my_any?(arg)
+  def my_any?(arg = nil)
     if block_given?
       my_each do |x|
         return true if yield x
@@ -84,11 +86,11 @@ module Enumerable
     !my_any?
   end
 
-  def my_count(_args = nil)
+  def my_count(args = nil)
     x = 0
     if block_given?
       my_each { |z| x += 1 if yield(z) == true }
-    elsif num.nil?
+    elsif arg.nil?
       c = length
     else
       my_each { |z| x += 1 if z == args }
@@ -137,6 +139,6 @@ end
 # rubocop:enable Metrics/CyclomaticComplexity
 # rubocop:enable Metrics/ModuleLength
 
-def multiply_els
-  my_inject(5, :*)
+def multiply_els(args)
+  args.my_inject(1) { |x, y| x * y }
 end
