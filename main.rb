@@ -12,7 +12,6 @@ module Enumerable
     end
     self
   end
-  [1, 2, 3].my_each { |n| puts "#{n}!" }
 
   def my_each_with_index
     return to_enum unless block_given?
@@ -25,7 +24,6 @@ module Enumerable
     end
     self
   end
-  [1, 2, 3].my_each_each_with_index { |_n, x| print x }
 
   def my_select
     return to_enum unless block_given?
@@ -35,7 +33,6 @@ module Enumerable
     arr.my_each { |x| final_array.push(x) if yield(x) }
     final_array
   end
-  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].my_select { |x| puts x if x.even? }
 
   def my_all?(arg = nil)
     arr = to_a
@@ -56,25 +53,24 @@ module Enumerable
   end
 
   def my_any?(arg = nil)
-    arr = to_a
     if block_given?
-      arr.my_each do |x|
+      my_each do |x|
         return true if yield(x)
       end
       return false
 
     elsif !arg.nil? && (arg.is_a? Class)
-      arr.my_each { |x| return true if [x.class, x.class.superclass].include?(arg) }
+      my_each { |x| return true if [x.class, x.class.superclass].include?(arg) }
 
     elsif (arg.is_a? Regexp) && !arg.nil?
-      arr.my_each { |x| return true if x.match(arg) }
+      my_each { |x| return true if x.match(arg) }
 
     elsif arg.nil?
 
-      arr.my_each { |x| return false if x == false || x.nil? }
+      my_each { |x| return true unless x == false || x.nil? }
 
     else
-      arr.my_each do |x|
+      my_each do |x|
         return true if x == arg
       end
 
@@ -82,20 +78,29 @@ module Enumerable
     false
   end
 
-  def my_none?(_arg = nil)
-    return to_enum unless block_given?
-
-    !my_any?
+  def my_none?(args = nil)
+    if block_given?
+      my_each { |x| return false if yield(x) }
+    elsif (args.is_a? Regexp) && !args.nil?
+      my_each { |x| return false if x.match(args) }
+    elsif args.nil?
+      my_each { |x| return false if x }
+    elsif !args.nil? && (args.is_a? Class)
+      my_each { |x| return false if [x.class, x.class.superclass].include?(args) }
+    else
+      my_each { |x| return false if x }
+    end
+    true
   end
 
-  def my_count(args = nil)
+  def my_count?(args = nil)
     x = 0
     if block_given?
-      my_each { |z| x += 1 if yield(z) == true }
+      my_each { |z| x += 1 if yield z }
     elsif !args.nil?
-      my_each { |z| x += 1 if z == arg }
+      my_each { |z| x += 1 if z == args }
     else
-      my_each { |z| x += 1 if z == true }
+      my_each { |z| x += 1 if z }
     end
     x
   end
