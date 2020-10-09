@@ -88,12 +88,12 @@ module Enumerable
     elsif !args.nil? && (args.is_a? Class)
       my_each { |x| return false if [x.class, x.class.superclass].include?(args) }
     else
-      my_each { |x| return false if x }
+      my_each { |x| return false if x == args }
     end
     true
   end
 
-  def my_count?(args = nil)
+  def my_count(args = nil)
     x = 0
     if block_given?
       my_each { |z| x += 1 if yield z }
