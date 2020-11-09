@@ -1,4 +1,4 @@
-require_relative '../main'
+require_relative '../main.rb'
 
 describe Enumerable do
   describe '#my_each' do
@@ -88,5 +88,31 @@ describe Enumerable do
     it 'If an argument is given, the number of items in enum that are equal to item are counted' do
       expect([1, 2, 4, 2].my_count(2)).to eql(2)
     end
+  end
+
+  describe '#my_map' do
+    it 'Returns a new array with the results of running block once for every element in enum' do
+      expect((1..4).my_map { |i| i * i }).to eql([1, 4, 9, 16])
+    end
+    it 'If no block is given, an enumerator is returned' do
+      expect([1, 2, 3, 4, 5].my_map).to be_a Enumerator
+    end
+  end
+
+  describe '#my_inject' do
+    it 'returns Combination of all elements of a collection by applying a binary operation, specified by a block' do
+      expect((5..10).my_inject { |sum, n| sum + n }).to eql(45)
+    end
+    it 'returns Combination of all elements of a collection by applying a binary operation specified by a symbol .' do
+      expect((5..10).my_inject(:+)).to eql(45)
+    end
+    it 'if an initial value is given as an argument it returns the elements combined with the initial value' do
+      expect((5..10).my_inject(1, :*)).to eql(151_200)
+    end
+  end
+end
+describe '#multiply_els' do
+  it 'returns the product of every element in the array' do
+    expect(multiply_els([2, 5])).to eql(10)
   end
 end
