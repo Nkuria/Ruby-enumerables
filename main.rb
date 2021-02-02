@@ -93,16 +93,18 @@ module Enumerable
     true
   end
 
-  def my_count(args = nil)
-    x = 0
-    if block_given?
-      my_each { |z| x += 1 if yield z }
-    elsif !args.nil?
-      my_each { |z| x += 1 if z == args }
-    else
-      my_each { |z| x += 1 if z }
+  def my_count(arg = nil)
+    return size if !block_given? && arg.nil?
+
+    counter = 0
+    my_each do |element|
+      if arg
+        counter += 1 if arg == element
+      elsif yield element
+        counter += 1
+      end
     end
-    x
+    counter
   end
 
   def my_map(proc = nil)
